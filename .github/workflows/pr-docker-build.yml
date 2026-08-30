@@ -1,0 +1,23 @@
+name: PR Docker Build
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read version from pom.xml
+        run: |
+          VERSION=$(grep -m1 '<version>' myapp/pom.xml | sed -E 's|.*<version>([^<]+)</version>.*|\1|')
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Build Docker image
+        run: docker build -f myapp/DockerFile -t myapp-pr-build:${VERSION} myapp
