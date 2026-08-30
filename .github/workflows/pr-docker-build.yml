@@ -30,12 +30,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Read version from pom.xml
+      - name: Calculate new version
         working-directory: myapp
         run: |
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           NEW_VERSION=$(echo "$CURRENT_VERSION" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
           echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
+
+      - name: Update pom.xml version
+        working-directory: myapp
+        run: mvn versions:set -DnewVersion=${NEW_VERSION} -DgenerateBackupPoms=false
 
       - name: Build Docker image
         working-directory: myapp
