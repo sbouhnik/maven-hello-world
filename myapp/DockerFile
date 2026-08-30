@@ -13,6 +13,10 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:25
 WORKDIR /app
 
+USER root
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+
+
 # Step e.ii: Ensure the Docker image doesn't run as root
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 USER appuser
