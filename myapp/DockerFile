@@ -10,7 +10,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Create Final Minimal Docker Image (Step e)
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:25
 WORKDIR /app
 
 # Step e.ii: Ensure the Docker image doesn't run as root
