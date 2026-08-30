@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      image-version: ${{ steps.image-version.outputs.image_version }}
 
     env:
       IMAGE_NAME: sbouhnik/myapp-pr-build
@@ -35,6 +37,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set image version
+        id: image-version
         working-directory: myapp
         run: |
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
@@ -44,6 +47,7 @@ jobs:
             IMAGE_VERSION=$CURRENT_VERSION
           fi
           echo "IMAGE_VERSION=$IMAGE_VERSION" >> "$GITHUB_ENV"
+          echo "image_version=$IMAGE_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Update pom.xml version
         if: github.event_name == 'pull_request'
@@ -65,3 +69,24 @@ jobs:
 
       - name: Push Docker image
         run: docker push $IMAGE_NAME:${IMAGE_VERSION}
+
+  docker-run:
+    needs: docker-build
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: sbouhnik/myapp-pr-build
+      IMAGE_VERSION: ${{ needs.docker-build.outputs.image-version }}
+
+    steps:
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Pull Docker image
+        run: docker pull $IMAGE_NAME:${IMAGE_VERSION}
+
+      - name: Run Docker image
+        run: docker run --rm $IMAGE_NAME:${IMAGE_VERSION}
