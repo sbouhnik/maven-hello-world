@@ -89,4 +89,4 @@ jobs:
         run: docker pull $IMAGE_NAME:${IMAGE_VERSION}
 
       - name: Run Docker image
-        run: docker run --rm $IMAGE_NAME:${IMAGE_VERSION}
+        run: docker run --rm $IMAGE_NAME:${IMAGE_VERSION} "${{ github.actor }}"

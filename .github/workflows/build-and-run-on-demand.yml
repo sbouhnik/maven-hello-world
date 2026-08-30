@@ -26,4 +26,4 @@ jobs:
         run: |
           ARTIFACT_ID=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.artifactId)
           VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
-          java -jar "target/${ARTIFACT_ID}-${VERSION}.jar"
+          java -jar "target/${ARTIFACT_ID}-${VERSION}.jar" "${{ github.actor }}"
