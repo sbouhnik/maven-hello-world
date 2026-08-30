@@ -76,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_NAME: sbouhnik/myapp-pr-build
+      IMAGE_NAME: sbouhnik/maven-hello-world
       IMAGE_VERSION: ${{ needs.docker-build.outputs.image-version }}
 
     steps:
