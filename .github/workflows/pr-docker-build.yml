@@ -22,6 +22,7 @@ jobs:
           cache: maven
 
       - name: Build Docker image
+        working-directory: myapp
         run: |
             CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
             NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
