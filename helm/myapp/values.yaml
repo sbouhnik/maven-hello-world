@@ -1,4 +1,4 @@
 image:
   repository: docker.io/sbouhnik/maven-hello-world
-  tag: "1.0.9"
+  tag: "latest"
 name: Shmuel Bouhnik

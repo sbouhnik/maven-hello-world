@@ -69,7 +69,10 @@ jobs:
         run: docker build -f DockerFile -t $IMAGE_NAME:${IMAGE_VERSION} .
 
       - name: Push Docker image
-        run: docker push $IMAGE_NAME:${IMAGE_VERSION}
+        run: |
+          docker push $IMAGE_NAME:${IMAGE_VERSION}
+          docker push $IMAGE_NAME:latest
+
 
   docker-run:
     needs: docker-build
