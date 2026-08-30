@@ -16,7 +16,7 @@ jobs:
       image-version: ${{ steps.image-version.outputs.image_version }}
 
     env:
-      IMAGE_NAME: sbouhnik/myapp-pr-build
+      IMAGE_NAME: sbouhnik/maven-hello-world
 
     steps:
       - name: Checkout repository
