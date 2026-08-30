@@ -27,4 +27,4 @@ jobs:
             CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
             NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
             mvn versions:set -DnewVersion=$NEW_VERSION
-            docker build -f myapp/DockerFile -t myapp-pr-build:${NEW_VERSION} myapp
+            docker build -f myapp/DockerFile -t myapp-pr-build:${NEW_VERSION} .
