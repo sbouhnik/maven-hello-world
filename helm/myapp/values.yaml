@@ -1,0 +1,4 @@
+image:
+  repository: docker.io/sbouhnik/myapp-pr-build
+  tag: "1.0.8"
+name: Shmuel Bouhnik
