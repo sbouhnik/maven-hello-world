@@ -34,28 +34,34 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Calculate new version
+      - name: Set image version
         working-directory: myapp
         run: |
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          NEW_VERSION=$(echo "$CURRENT_VERSION" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
-          echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            IMAGE_VERSION=$(echo "$CURRENT_VERSION" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          else
+            IMAGE_VERSION=$CURRENT_VERSION
+          fi
+          echo "IMAGE_VERSION=$IMAGE_VERSION" >> "$GITHUB_ENV"
 
       - name: Update pom.xml version
+        if: github.event_name == 'pull_request'
         working-directory: myapp
-        run: mvn versions:set -DnewVersion=${NEW_VERSION} -DgenerateBackupPoms=false
+        run: mvn versions:set -DnewVersion=${IMAGE_VERSION} -DgenerateBackupPoms=false
 
       - name: Commit updated pom.xml
+        if: github.event_name == 'pull_request'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add myapp/pom.xml
-          git diff --cached --quiet || git commit -m "chore: bump version to ${NEW_VERSION}"
+          git diff --cached --quiet || git commit -m "chore: bump version to ${IMAGE_VERSION}"
           git push origin HEAD:${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
       - name: Build Docker image
         working-directory: myapp
-        run: docker build -f DockerFile -t $IMAGE_NAME:${NEW_VERSION} .
+        run: docker build -f DockerFile -t $IMAGE_NAME:${IMAGE_VERSION} .
 
       - name: Push Docker image
-        run: docker push $IMAGE_NAME:${NEW_VERSION}
+        run: docker push $IMAGE_NAME:${IMAGE_VERSION}
