@@ -23,4 +23,7 @@ jobs:
 
       - name: Run the app
         working-directory: myapp
-        run: java -jar target/myapp-1.0.0.jar
+        run: |
+          ARTIFACT_ID=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.artifactId)
+          VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
+          java -jar "target/${ARTIFACT_ID}-${VERSION}.jar"
