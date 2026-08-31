@@ -2,6 +2,11 @@ name: Build and Run
 
 on:
   workflow_dispatch:
+    inputs:
+      name:
+        description: 'Name parameter'
+        required: true
+        default: 'Shmuel Bouhnik'
 
 jobs:
   build-and-run:
@@ -26,4 +31,4 @@ jobs:
         run: |
           ARTIFACT_ID=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.artifactId)
           VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
-          java -jar "target/${ARTIFACT_ID}-${VERSION}.jar" "${{ github.actor }}"
+          java -jar "target/${ARTIFACT_ID}-${VERSION}.jar" "${{ inputs.name }}"
