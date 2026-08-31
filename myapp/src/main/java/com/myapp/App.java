@@ -8,6 +8,11 @@ public class App
 {
     public static void main( String[] args )
     {
-        System.out.println( args[0] + " is saying you Hello World!!!" );
+        if ( args.length == 0 )
+        {
+            System.err.println( "Usage: myapp <name>" );
+            System.exit( 1 );
+        }
+        System.out.println( args[0] + " is saying Hello World!" );
     }
 }
