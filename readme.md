@@ -1,147 +1,79 @@
-# A simple, minimal Maven example: hello world
+# maven-hello-world
 
-To create the files in this git repo we've already run `mvn archetype:generate` from http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html
-    
-    mvn archetype:generate -DgroupId=com.myapp.app -DartifactId=myapp -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.4 -DinteractiveMode=false
+A minimal Java application that prints a personalized greeting. Used as a reference project for Maven, Docker, GitHub Actions CI/CD, and Helm.
 
-Now, to print "Hello World!", type either...
+## Prerequisites
 
-    cd myapp
-    mvn compile
-    java -cp target/classes com.myapp.app.App
+- JDK 25
+- Maven 3.9+
+- Docker (optional)
+- Helm + Kubernetes (optional)
 
-or...
+## Build and run locally
 
-    cd myapp
-    mvn package
-    java -cp target/myapp-1.0-SNAPSHOT.jar com.myapp.app.App
-
-Running `mvn clean` will get us back to only the source Java and the `pom.xml`:
-
-    murphy:myapp pdurbin$ mvn clean --quiet
-    murphy:myapp pdurbin$ ack -a -f
-    pom.xml
-    src/main/java/com/myapp/app/App.java
-    src/test/java/com/myapp/app/AppTest.java
-
-Running `mvn compile` produces a class file:
-
-    murphy:myapp pdurbin$ mvn compile --quiet
-    murphy:myapp pdurbin$ ack -a -f
-    pom.xml
-    src/main/java/com/myapp/app/App.java
-    src/test/java/com/myapp/app/AppTest.java
-    target/classes/com/myapp/app/App.class
-    murphy:myapp pdurbin$ 
-    murphy:myapp pdurbin$ java -cp target/classes com.myapp.app.App
-    Hello World!
-
-Running `mvn package` does a compile and creates the target directory, including a jar:
-
-    murphy:myapp pdurbin$ mvn clean --quiet
-    murphy:myapp pdurbin$ mvn package > /dev/null
-    murphy:myapp pdurbin$ ack -a -f
-    pom.xml
-    src/main/java/com/myapp/app/App.java
-    src/test/java/com/myapp/app/AppTest.java
-    target/classes/com/myapp/app/App.class
-    target/maven-archiver/pom.properties
-    target/myapp-1.0-SNAPSHOT.jar
-    target/surefire-reports/com.myapp.app.AppTest.txt
-    target/surefire-reports/TEST-com.myapp.app.AppTest.xml
-    target/test-classes/com/myapp/app/AppTest.class
-    murphy:myapp pdurbin$ 
-    murphy:myapp pdurbin$ java -cp target/myapp-1.0-SNAPSHOT.jar com.myapp.app.App
-    Hello World!
-
-Running `mvn clean compile exec:java` requires https://www.mojohaus.org/exec-maven-plugin/
-
-Running `java -jar target/myapp-1.0-SNAPSHOT.jar` requires http://maven.apache.org/plugins/maven-shade-plugin/
-
-# Runnable Jar:
-JAR Plugin
-The Maven’s jar plugin will create jar file and we need to define the main class that will get executed when we run the jar file.
-```
-<plugin>
-  <artifactId>maven-jar-plugin</artifactId>
-  <version>3.0.2</version>
-  <configuration>
-    <archive>
-      <manifest>
-        <addClasspath>true</addClasspath>
-        <mainClass>com.myapp.App</mainClass>
-      </manifest>
-    </archive>
-  </configuration>
-</plugin>
+```bash
+cd myapp
+mvn package -B
+java -jar target/maven-hello-world-*.jar "Your Name"
+# Your Name is saying you Hello World!!!
 ```
 
+## Docker
 
-# Folder tree before package:
-```
-├── pom.xml
-└── src
-    ├── main
-    │   └── java
-    │       └── com
-    │           └── myapp
-    │               └── app
-    │                   └── App.java
-    └── test
-        └── java
-            └── com
-                └── myapp
-                    └── app
-                        └── AppTest.java
-
-```
-# Folder tree after package:
+**Build:**
+```bash
+cd myapp
+docker build -f Dockerfile -t maven-hello-world .
 ```
 
-.
-├── pom.xml
-├── src
-│   ├── main
-│   │   └── java
-│   │       └── com
-│   │           └── myapp
-│   │               └── app
-│   │                   └── App.java
-│   └── test
-│       └── java
-│           └── com
-│               └── myapp
-│                   └── app
-│                       └── AppTest.java
-└── target
-    ├── classes
-    │   └── com
-    │       └── myapp
-    │           └── app
-    │               └── App.class
-    ├── generated-sources
-    │   └── annotations
-    ├── generated-test-sources
-    │   └── test-annotations
-    ├── maven-archiver
-    │   └── pom.properties
-    ├── maven-status
-    │   └── maven-compiler-plugin
-    │       ├── compile
-    │       │   └── default-compile
-    │       │       ├── createdFiles.lst
-    │       │       └── inputFiles.lst
-    │       └── testCompile
-    │           └── default-testCompile
-    │               ├── createdFiles.lst
-    │               └── inputFiles.lst
-    ├── myapp-1.0-SNAPSHOT.jar
-    ├── surefire-reports
-    │   ├── com.myapp.app.AppTest.txt
-    │   └── TEST-com.myapp.app.AppTest.xml
-    └── test-classes
-        └── com
-            └── myapp
-                └── app
-                    └── AppTest.class
+**Run:**
+```bash
+docker run --rm maven-hello-world "Your Name"
+# Your Name is saying you Hello World!!!
+```
+
+The image is published to Docker Hub at [`sbouhnik/maven-hello-world`](https://hub.docker.com/r/sbouhnik/maven-hello-world).
+
+```bash
+docker run --rm sbouhnik/maven-hello-world:latest "Your Name"
+```
+
+## CI/CD
+
+Two GitHub Actions workflows are defined in `.github/workflows/`:
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `PR Docker Build` | Pull request / manual | Bumps patch version in `pom.xml`, builds and pushes Docker image to Docker Hub, then runs the image |
+| `Build and Run` | Manual | Builds with Maven and runs the jar |
+
+Requires `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` repository secrets.
+
+## Helm
+
+A Helm chart is provided under `helm/myapp/` for running the app as a Kubernetes Job.
+
+```bash
+helm install myapp helm/myapp \
+  --set name="Your Name" \
+  --set image.tag=latest
+```
+
+## Project structure
+
+```
+├── myapp/
+│   ├── Dockerfile
+│   ├── pom.xml
+│   └── src/
+│       ├── main/java/com/myapp/App.java
+│       └── test/java/com/myapp/AppTest.java
+├── helm/
+│   └── myapp/
+│       ├── Chart.yaml
+│       ├── values.yaml
+│       └── templates/job.yaml
+└── .github/workflows/
+    ├── pr-docker-build.yml
+    └── build-and-run-on-demand.yml
 ```
