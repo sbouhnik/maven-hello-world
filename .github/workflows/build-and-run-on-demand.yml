@@ -1,5 +1,5 @@
-#name: Build and Run
-#
+name: Build and Run
+
 on:
   workflow_dispatch:
     inputs:
