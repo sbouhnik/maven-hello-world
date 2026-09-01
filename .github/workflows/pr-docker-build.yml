@@ -97,3 +97,39 @@ jobs:
 
       - name: Run Docker image
         run: docker run --rm $IMAGE_NAME:${IMAGE_VERSION} "${{ github.actor }}"
+
+
+  update-helm:
+    needs: docker-build
+    if: github.event_name != 'pull_request' || github.event.sender.login != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    env:
+      IMAGE_VERSION: ${{ needs.docker-build.outputs.image-version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref }}
+
+      - name: Update Helm Chart appVersion
+        working-directory: helm/myapp
+        run: |
+          sed -i 's/^appVersion: .*/appVersion: "'$IMAGE_VERSION'"/' Chart.yaml
+
+      - name: Update Helm values file tag
+        working-directory: helm/myapp
+        run: |
+          sed -i 's/^  tag: .*/  tag: "'$IMAGE_VERSION'"/' values.yaml
+
+      - name: Commit updated Helm configuration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add helm/myapp/Chart.yaml helm/myapp/values.yaml
+          git diff --cached --quiet || git commit -m "chore: bump helm versions to ${IMAGE_VERSION} [skip ci]"
+          git push origin HEAD:${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
