@@ -13,6 +13,6 @@ public class App
             System.err.println( "Usage: myapp <name>" );
             System.exit( 1 );
         }
-        System.out.println( args[0] + " is saying Hello World !!!!!" );
+        System.out.println( args[0] + " is saying Hello World !!!!!!" );
     }
 }
