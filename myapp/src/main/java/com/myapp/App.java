@@ -19,6 +19,6 @@ public class App
             version = "unknown";
         }
         
-        System.out.println( args[0] + " is saying Hello World (Version: " + version + ")" );
+        System.out.println( args[0] + " is saying Hello World (Version: " + version + ") and bye" );
     }
 }
