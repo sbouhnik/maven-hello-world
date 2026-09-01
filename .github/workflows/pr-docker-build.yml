@@ -1,4 +1,4 @@
-name: PR Docker Build
+name: "PR Docker Build"
 
 on:
   workflow_dispatch:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   docker-build:
+    name: "Build and Push Docker Image"
     if: github.event_name != 'pull_request' || github.event.sender.login != 'github-actions[bot]'
     runs-on: ubuntu-latest
     permissions:
@@ -78,6 +79,7 @@ jobs:
 
 
   docker-run:
+    name: "Run Docker Image"
     needs: docker-build
     runs-on: ubuntu-latest
 
@@ -100,6 +102,7 @@ jobs:
 
 
   update-helm:
+    name: "Update Helm Chart"
     needs: [docker-build, docker-run]
     if: github.event_name != 'pull_request' || github.event.sender.login != 'github-actions[bot]'
     runs-on: ubuntu-latest
