@@ -100,7 +100,7 @@ jobs:
 
 
   update-helm:
-    needs: docker-build
+    needs: [docker-build, docker-run]
     if: github.event_name != 'pull_request' || github.event.sender.login != 'github-actions[bot]'
     runs-on: ubuntu-latest
     permissions:
