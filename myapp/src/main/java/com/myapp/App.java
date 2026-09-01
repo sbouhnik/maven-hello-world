@@ -13,6 +13,12 @@ public class App
             System.err.println( "Usage: myapp <name>" );
             System.exit( 1 );
         }
-        System.out.println( args[0] + " is saying Hello World !!!!!!!!" );
+        
+        String version = App.class.getPackage().getImplementationVersion();
+        if (version == null) {
+            version = "unknown";
+        }
+        
+        System.out.println( args[0] + " is saying Hello World (Version: " + version + ")" );
     }
 }
